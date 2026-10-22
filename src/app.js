@@ -9,6 +9,8 @@ const subtitles=['선 하나로 시작하는 작은 모험','작은 상상으로
 const storage={get(key,fallback){try{return JSON.parse(localStorage.getItem('mumu-'+key))??fallback}catch{return fallback}},set(key,data){try{localStorage.setItem('mumu-'+key,JSON.stringify(data));return true}catch{return false}}};
 let current=0,world,tool='box',color=colors[0][1],penWidth=5,stroke=null,art=[],history=[],particles=[],free=false,paused=false,audioOn=false,audio,clock=0,last=0,accumulator=0,winAt=0,seenWin=false,rescueNotice=0;
 let canvasInput;
+const portraitQuery=window.matchMedia('(max-width:760px) and (orientation:portrait)');
+let orientationBlocked=false;
 let demo=false,demoAction=0,demoDrawings=[],demoShownSecond=-1;
 let completed=storage.get('campaign-completed-v1',[]),gallery=storage.get('gallery',[]);
 if(!Array.isArray(completed))completed=[];completed=[...new Set(completed)].filter(n=>Number.isInteger(n)&&n>=0&&n<MUMU_LEVELS.length);
@@ -65,7 +67,7 @@ function commitStroke(s){
   status();
 }
 canvasInput=MumuCanvasInput.bind(canvas,{
-  width:W,height:H,enabled:()=>!demo&&$('winCard').hidden,
+  width:W,height:H,enabled:()=>!orientationBlocked&&!demo&&$('winCard').hidden,
   style:()=>({tool,color,width:penWidth}),erase,
   preview:s=>{stroke=s;},begin:()=>{$('drawingTip').hidden=true;},commit:commitStroke
 });
@@ -81,7 +83,7 @@ $('nextBtn').onclick=()=>{if(current<MUMU_LEVELS.length-1)load(current+1);else M
 $('freeBtn').onclick=()=>load(current,!free);
 $('brand').onclick=e=>{e.preventDefault();load(0);};
 function showDialog(id){$(id).showModal();}
-for(const d of document.querySelectorAll('dialog')){d.querySelector('.close-dialog').onclick=()=>d.close();d.addEventListener('click',e=>{if(e.target===d&&!(e.clientX>d.getBoundingClientRect().left&&e.clientX<d.getBoundingClientRect().right&&e.clientY>d.getBoundingClientRect().top&&e.clientY<d.getBoundingClientRect().bottom))d.close();});}
+for(const d of document.querySelectorAll('dialog:not(#orientationGate)')){d.querySelector('.close-dialog').onclick=()=>d.close();d.addEventListener('click',e=>{if(e.target===d&&!(e.clientX>d.getBoundingClientRect().left&&e.clientX<d.getBoundingClientRect().right&&e.clientY>d.getBoundingClientRect().top&&e.clientY<d.getBoundingClientRect().bottom))d.close();});}
 $('missionBtn').onclick=()=>showDialog('missionDialog');document.querySelector('.close-dialog-button').onclick=()=>{$('missionDialog').close();setTool('art');};$('aboutBtn').onclick=()=>showDialog('aboutDialog');
 $('quickHelpBtn').onclick=()=>showDialog('aboutDialog');
 function saveArt(){
@@ -140,13 +142,23 @@ function demonstrationStep(){
 }
 function frame(time){
  const dt=last?Math.min((time-last)/1000,.1):0;last=time;clock+=dt;
- if(!paused&&(!world.completed||free)&&!document.hidden&&!document.querySelector('dialog[open]')){accumulator+=dt*1000;let steps=0;while(accumulator>=C.STEP&&steps<3){if(demo&&!world.completed)demonstrationStep();C.step(world);accumulator-=C.STEP;steps++;if(world.completed&&!free){accumulator=0;break;}}if(steps===3)accumulator=Math.min(accumulator,C.STEP);}
+ if(!paused&&!orientationBlocked&&(!world.completed||free)&&!document.hidden&&!document.querySelector('dialog[open]')){accumulator+=dt*1000;let steps=0;while(accumulator>=C.STEP&&steps<3){if(demo&&!world.completed)demonstrationStep();C.step(world);accumulator-=C.STEP;steps++;if(world.completed&&!free){accumulator=0;break;}}if(steps===3)accumulator=Math.min(accumulator,C.STEP);}
  if(demo&&Math.floor(world.tick/60)!==demoShownSecond){demoShownSecond=Math.floor(world.tick/60);$('demoNotice').textContent=world.completed?'예시 완료 · 이제 나만의 방법으로 그려보세요.':'예시 관찰 · '+demoShownSecond+'초 / 약 '+Math.ceil(window.MUMU_EXAMPLES[current].winTick/60)+'초 · 직접 해보기도 가능해요';}
  for(const p of particles){p.x+=p.vx*dt*60;p.y+=p.vy*dt*60;p.vy+=dt*1.4;p.life-=dt*.9;}particles=particles.filter(p=>p.life>0);
  if(world.completed&&!free&&!seenWin&&clock>winAt){seenWin=true;const final=current===MUMU_LEVELS.length-1,all=completed.length===MUMU_LEVELS.length,chapterEnd=(current+1)%10===0;$('winTitle').textContent=demo?'이렇게도 풀 수 있어요.':all?'백 장의 정원이 완성됐어요!':final?'백 번째 종이 정원, 완성!':chapterEnd?'이 정원의 마지막 햇살!':'반짝! 해냈어요.';$('winText').textContent=demo?'이제 나만의 방법으로 그려볼까요?\n시범 재생은 완료 수에 기록되지 않아요.':all?'100페이지에 나만의 이야기를 남겼어요. 작품을 간직해볼까요?':final?'완성한 페이지 '+completed.length+' / 100\n목차에서 다른 정원도 펼쳐보세요.':chapterEnd?'한 챕터를 여행했어요. 다음 정원으로 가볼까요?':'이 장면에 나만의 색을 더해볼까요?';$('nextBtn').textContent=final?'목차 펼치기 →':'다음 페이지 →';$('winCard').hidden=false;tone(523,.4,.03);tone(659,.4,.025,'sine',.12);tone(784,.6,.025,'sine',.24);}
  render();requestAnimationFrame(frame);
 }
 document.addEventListener('visibilitychange',()=>{last=0;accumulator=0;canvasInput.cancel();});
+function syncOrientation(){
+  orientationBlocked=portraitQuery.matches;
+  canvasInput.cancel();last=0;accumulator=0;
+  const gate=$('orientationGate');
+  if(orientationBlocked&&!gate.open)gate.showModal();
+  else if(!orientationBlocked&&gate.open)gate.close();
+}
+$('orientationGate').addEventListener('cancel',e=>e.preventDefault());
+portraitQuery.addEventListener('change',syncOrientation);
+syncOrientation();
 window.MumuGame={snapshot:()=>({level:current,total:MUMU_LEVELS.length,free,tool,paused,drawings:world.drawings.length,artStrokes:art.length,stars:world.stars.map(s=>({...s})),completed:world.completed,ball:{x:world.ball.position.x,y:world.ball.position.y},contacts:world.contacts,gallery:gallery.length}),version:'1.0.0'};
 Promise.all([bitmapReady,document.fonts.ready]).then(()=>{load(storage.get('campaign-last-stage-v1',0));requestAnimationFrame(frame);});
 })();

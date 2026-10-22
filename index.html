@@ -87,5 +87,14 @@
 <dialog id="missionDialog" class="paper-dialog"><button class="close-dialog" aria-label="닫기">×</button><span class="eyebrow">A LITTLE ART CHALLENGE</span><h2 id="missionTitle">세 가지 색의 시작</h2><p id="missionDescription"></p><div class="mission-colors"><i></i><i></i><i></i></div><ol><li><b>관찰해요</b><span>어디에 빛이 오고, 빨간 원은 어디에 있나요?</span></li><li><b>그려봐요</b><span>색연필 도구로 장면에 내 이야기를 더해보세요.</span></li><li><b>발견해요</b><span>색을 바꾸면 어떤 느낌이 드는지 비교해보세요.</span></li></ol><p class="mission-note">점수도, 틀린 그림도 없어요. 시도한 것이 오늘의 작품이에요.</p><button class="primary-button close-dialog-button">색연필 들기 →</button></dialog>
 <dialog id="galleryDialog" class="gallery-dialog"><button class="close-dialog" aria-label="닫기">×</button><span class="eyebrow">MY LITTLE COLLECTION</span><h2>무무의 스케치북</h2><p>한 페이지, 한 페이지. 상상한 순간을 모아두었어요.</p><div id="galleryGrid"></div><p class="gallery-note">작품은 이 브라우저에 저장돼요. 소중한 그림은 PNG로도 내려받아 주세요.</p></dialog>
 <dialog id="aboutDialog" class="paper-dialog"><button class="close-dialog" aria-label="닫기">×</button><span class="eyebrow">HOW TO PLAY</span><h2>그림이 움직이기 시작해요.</h2><p>빨간 원을 별까지 보내면 페이지가 완성돼요.</p><ul class="how-to"><li><b>네모</b> 대각선으로 드래그하면 네모가 생겨요. 큰 물체는 더 무거워요.</li><li><b>물리펜</b> 네모나 길쭉한 막대를 그려보세요. 손그림은 회전하는 네모 물체가 돼요.</li><li><b>색연필</b> 충돌하지 않는 그림을 그려요. 무늬·명암·배경을 자유롭게 더해보세요.</li><li><b>지우개 / 오른쪽 클릭</b> 내가 그린 물체·색연필 선과 미리 그려진 보라색 벽을 지워요.</li><li><b>균형 잡기</b> 물체를 떨어뜨려 빨간 원을 굴리고, 판 위의 무게를 바꾸어보세요.</li></ul><p class="mission-note">종이 정원 그림·크레용 붓·효과음은 무무 크레용을 위해 새로 만들었어요. 글꼴은 Gaegu / Finger Paint, 물리 엔진은 Matter.js를 사용해요.</p><p class="mission-note">Crayon Physics의 그리기·무게·충돌 원리를 연구한 새 게임입니다. 퍼즐 배치와 그림은 무무만의 구성이며, 움직임은 원작과 차이가 있어요.</p></dialog>
+<dialog id="orientationGate" class="orientation-gate" aria-labelledby="orientationTitle" aria-describedby="orientationDescription">
+  <div class="rotation-card">
+    <span class="rotation-brand">무무 크레용.</span>
+    <svg viewBox="0 0 128 96" class="rotation-icon" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="23" y="28" width="82" height="47" rx="7" transform="rotate(-5 64 52)"/><path d="m34 36 2 31m58-34 2 31M37 18Q65-5 94 16m0 0-12-1m12 1-2-12"/><circle cx="64" cy="53" r="10" stroke="#c67d66"/></g></svg>
+    <h1 id="orientationTitle">가로로 돌려주세요</h1>
+    <p id="orientationDescription">종이를 넓게 펼치고<br>그림으로 길을 만들어봐요.</p>
+    <p class="rotation-note">그리던 그림과 진행은 그대로 이어져요.</p>
+  </div>
+</dialog>
 <script src="vendor/matter.min.js"></script><script src="src/campaign-levels.js"></script><script src="src/campaign-examples.js"></script><script src="src/mumu-art.js"></script><script src="src/core.js"></script><script src="src/campaign-ui.js"></script><script src="src/canvas-input.js"></script><script src="src/app.js"></script>
 </body></html>
