@@ -2,7 +2,7 @@
 
 그린 네모에 무게가 생기고, 빨간 원이 굴러가 햇살 별을 만나는 물리 그림 놀이입니다. 퍼즐을 푼 장면에 색연필로 나만의 그림을 더할 수 있습니다.
 
-**[바로 플레이하기](https://reinhardt7177-lab.github.io/mumu-crayon/)** · [100개 스테이지](docs/CAMPAIGN-100.md) · [배포와 업데이트](docs/DEPLOYMENT.md)
+**[바로 플레이하기 · Cloudflare](https://mumu-crayon.reinhardt7177.workers.dev/)** · [GitHub Pages](https://reinhardt7177-lab.github.io/mumu-crayon/) · [100개 스테이지](docs/CAMPAIGN-100.md) · [배포와 업데이트](docs/DEPLOYMENT.md)
 
 설치나 로그인 없이 브라우저에서 플레이합니다. PC에서는 마우스, 터치 화면에서는 드래그로 그리세요. **휴대폰에서는 가로로 플레이합니다.** 세로로 열면 회전 안내가 나오고, 가로로 돌리면 게임이 이어집니다.
 

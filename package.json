@@ -7,6 +7,7 @@
   "scripts": {
     "build": "node tools/build-site.cjs",
     "test": "node tools/verify_physics.cjs && node tools/verify_input.cjs && node tools/verify_campaign.cjs",
-    "check:site": "node tools/verify-site.cjs"
+    "check:site": "node tools/verify-site.cjs",
+    "deploy:cloudflare": "npm run build && npm run check:site && wrangler deploy"
   }
 }

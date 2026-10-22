@@ -1,11 +1,25 @@
 # 공개 배포
 
 - 저장소: <https://github.com/reinhardt7177-lab/mumu-crayon>
-- 플레이 주소: <https://reinhardt7177-lab.github.io/mumu-crayon/>
-- 방식: GitHub Actions → GitHub Pages
+- Cloudflare 플레이 주소: <https://mumu-crayon.reinhardt7177.workers.dev/>
+- GitHub Pages 주소: <https://reinhardt7177-lab.github.io/mumu-crayon/>
+- Cloudflare 방식: Workers Static Assets · `wrangler.jsonc` · `dist`만 배포
+- GitHub Pages 방식: GitHub Actions → GitHub Pages
 - 배포 브랜치: `main`
 
 ## 업데이트
+
+### Cloudflare
+
+로그인된 Wrangler CLI가 있는 환경에서 실행합니다.
+
+```sh
+npm run deploy:cloudflare
+```
+
+이 명령은 실행 파일을 다시 빌드하고 목록·경로·해시를 검사한 뒤 Cloudflare에 올립니다. 계정 인증 정보는 Wrangler의 로컬 인증 저장소를 사용하며 소스나 배포 파일에 넣지 않습니다. Cloudflare 배포는 이 명령으로 실행합니다. GitHub에 올리는 것만으로 Cloudflare가 자동 갱신되도록 설정하지는 않았습니다.
+
+### GitHub Pages
 
 `main`에 올리면 `.github/workflows/pages.yml`이 물리 검증, 100스테이지 해법 재생, 정적 파일 빌드와 배포 경로 검사를 차례로 실행합니다. 검사에 실패하면 새 버전을 배포하지 않습니다.
 
