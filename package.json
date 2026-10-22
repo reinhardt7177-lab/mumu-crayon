@@ -1,0 +1,12 @@
+{
+  "name": "mumu-crayon",
+  "version": "1.0.0",
+  "private": true,
+  "description": "무무 크레용 · 백 장의 종이 정원",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "build": "node tools/build-site.cjs",
+    "test": "node tools/verify_physics.cjs && node tools/verify_campaign.cjs",
+    "check:site": "node tools/verify-site.cjs"
+  }
+}

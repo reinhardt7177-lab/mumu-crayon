@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="그린 네모가 진짜 물체가 되는 무무 크레용. 백 장의 종이 정원에서 빨간 원을 별까지 보내고 나만의 그림을 완성해보세요.">
+<meta name="theme-color" content="#f4f1e9"><title>무무 크레용 · MUMU CRAYON</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23faedc6'/%3E%3Ccircle cx='32' cy='32' r='23' fill='none' stroke='%23cf6852' stroke-width='5'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="src/style.css"><link rel="stylesheet" href="src/garden-skin.css">
+<link rel="stylesheet" href="src/campaign.css">
+</head>
+<body>
+<svg class="symbols" aria-hidden="true"><defs>
+<symbol id="pencil" viewBox="0 0 24 24"><path d="m4 20 1-5L16 4l4 4L9 19zM14 6l4 4M5 15l4 4M16 4l2-2 4 4-2 2"/></symbol>
+<symbol id="box" viewBox="0 0 24 24"><path d="m4 4 15-1 1 16-16 1zM4 4l1 15M4 4l15 1"/></symbol>
+<symbol id="eraser" viewBox="0 0 24 24"><path d="m3 14 9-11 9 8-8 10H9zM7 10l9 8M12 21h10"/></symbol>
+<symbol id="undo" viewBox="0 0 24 24"><path d="m9 5-6 6 6 6M3 11h10a7 7 0 0 1 7 7"/></symbol>
+<symbol id="reset" viewBox="0 0 24 24"><path d="M4 9a8 8 0 1 1 0 6M4 3v6h6"/></symbol>
+<symbol id="sound" viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9zM16 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>
+<symbol id="save" viewBox="0 0 24 24"><path d="M5 3h12l4 4v14H3V3zM7 3v6h10V3M7 21v-8h10v8"/></symbol>
+<symbol id="book" viewBox="0 0 24 24"><path d="M3 4h7l2 2 2-2h7v16h-7l-2 1-2-1H3zM12 6v15"/></symbol>
+<symbol id="star" viewBox="0 0 24 24"><path d="m12 2 3 6 7 1-5 5 1 8-6-4-6 4 1-8-5-5 7-1z"/></symbol>
+<symbol id="chevron" viewBox="0 0 24 24"><path d="m8 4 8 8-8 8"/></symbol>
+</defs></svg>
+<main class="app">
+<header class="masthead">
+  <a href="#" class="brand" id="brand" aria-label="무무 크레용 처음으로">
+    <svg class="mumu-logo" viewBox="0 0 70 64" aria-hidden="true"><path fill="#efd18d" d="m19 18-1-12 8 9m20 3 5-12 2 15"/><path fill="#e2ab9e" stroke="#555047" stroke-width="2" d="M17 23C-2 8 2 40 18 34m35-11c18-15 17 17 1 12"/><path fill="#fffdf5" stroke="#555047" stroke-width="2" d="M16 28C13 4 58 6 56 31l-2 15c-3 19-37 17-39-2z"/><path fill="#748f85" d="M20 19c7-10 13-6 12 2s-4 13-13 9z"/><ellipse cx="35" cy="44" rx="18" ry="12" fill="#efb7a5"/><path stroke="#555047" stroke-width="2.5" stroke-linecap="round" d="M27 31v3m18-3v3m-17 9v2m14-2v2M32 51q4 3 8 0"/></svg>
+    <span><b>무무 크레용<span class="brand-dot">.</span></b><small>그림을 그리고, 빨간 원을 별까지.</small></span>
+  </a>
+  <nav class="top-actions" aria-label="게임 메뉴">
+    <button id="stagesBtn" class="stage-index-button">목차 <small id="progressCount">0/100</small></button>
+    <button id="missionBtn" class="quiet-button"><span class="tiny-spark">✧</span> 오늘의 미술 미션</button>
+    <button id="galleryBtn" class="outlined-button"><svg><use href="#book"/></svg> 내 스케치북 <span id="galleryCount" class="pill">0</span></button>
+  </nav>
+</header>
+
+<section class="workspace" aria-label="무무 크레용 게임">
+  <div class="page-toolbar">
+    <div class="chapter"><span class="chapter-marker">PAGE <b id="pageNumber">01</b></span><h1 id="levelTitle">첫 번째 낙서</h1><span class="chapter-divider"></span><span class="chapter-subtitle" id="chapterSubtitle">선 하나로 시작하는 작은 모험</span></div>
+    <div id="levelTabs" class="level-tabs" role="group" aria-label="퍼즐 선택"></div>
+  </div>
+
+  <div class="campaign-navigation"><select id="chapterSelect" class="chapter-select" aria-label="챕터 선택"></select><button id="demoBtn" class="example-button">예시 재생</button><div class="page-arrows"><button id="prevPageBtn" aria-label="이전 스테이지">←</button><span id="stageCounter">1 / 100</span><button id="nextPageBtn" aria-label="다음 스테이지">→</button></div></div>
+
+  <div class="sketchbook" id="sketchbook">
+    <div class="binding" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="canvas-wrap" id="canvasWrap">
+      <canvas id="game" width="800" height="600" tabindex="0" aria-label="무무 크레용 그림판. 네모 도구로 드래그하면 물리 도형이 생깁니다. 오른쪽 클릭으로 내가 그린 도형을 지울 수 있습니다."></canvas>
+      <div class="example-notice" id="demoNotice" hidden>예시를 관찰해요 · 직접 그릴 때는 ‘직접 해보기’</div>
+      <div class="canvas-corner"><span class="little-star">★</span><span id="starStatus">0 / 1</span><span class="canvas-corner-line"></span><span id="modeLabel">빨간 원을 별까지 보내주세요</span></div>
+      <div class="drawing-tip" id="drawingTip"><span>네모를 그리면<br><b>진짜 물체가 돼요!</b></span><svg viewBox="0 0 66 40"><path d="M60 5Q30 1 7 33m0 0 14-2M7 33l2-13"/></svg></div>
+      <div class="toast" role="status" id="toast"></div>
+      <div class="win-card" id="winCard" hidden>
+        <span class="win-eyebrow">TODAY IN THE PAPER GARDEN</span><div class="win-stars">✦ ✧ ✦</div>
+        <h2 id="winTitle">반짝! 해냈어요.</h2><p id="winText">이 장면에 나만의 색을 더해볼까요?</p>
+        <div><button class="outlined-button" id="decorateBtn">계속 꾸미기</button><button class="primary-button" id="nextBtn">다음 페이지 <span>→</span></button></div>
+      </div>
+    </div>
+    <div class="page-foot"><span><i class="status-dot"></i><span id="hint">왼쪽 위에 네모를 떨어뜨려 무무를 굴려보세요.</span></span><span class="page-signature">made with a little imagination <b>✧</b></span></div>
+  </div>
+
+  <div class="art-tray">
+    <div class="tool-group" aria-label="그리기 도구">
+      <button class="tool selected" data-tool="box" aria-pressed="true" title="네모 도구 · 1"><svg><use href="#box"/></svg><span>네모</span></button>
+      <button class="tool" data-tool="physics" aria-pressed="false" title="물리펜 · 2"><svg><use href="#pencil"/></svg><span>물리펜</span><i>✧</i></button>
+      <button class="tool" data-tool="art" aria-pressed="false" title="색연필 · 3"><svg><use href="#pencil"/></svg><span>색연필</span></button>
+      <button class="tool" data-tool="erase" aria-pressed="false" title="지우개 · 4"><svg><use href="#eraser"/></svg><span>지우개</span></button>
+    </div>
+    <div class="tray-divider"></div>
+    <div id="palette" class="palette" role="group" aria-label="크레용 색상"></div>
+    <div class="line-width"><label for="penWidth"><span id="widthPreview"></span><small>선 굵기</small></label><input id="penWidth" aria-label="색연필 선 굵기" type="range" min="2" max="15" value="5"></div>
+    <div class="tray-divider"></div>
+    <div class="utility-tools">
+      <button id="undoBtn" title="마지막 그림 되돌리기 · Ctrl+Z" aria-label="되돌리기"><svg><use href="#undo"/></svg></button>
+      <button id="resetBtn" title="이 페이지 다시 시작 · Space" aria-label="다시 시작"><svg><use href="#reset"/></svg></button>
+      <button id="pauseBtn" title="물리 일시정지 · P" aria-label="물리 일시정지">Ⅱ</button>
+      <button id="soundBtn" title="소리 켜기" aria-label="소리 켜기" aria-pressed="false"><svg><use href="#sound"/></svg><i class="muted-slash"></i></button>
+    </div>
+    <button class="save-button" id="saveBtn"><svg><use href="#save"/></svg><span>작품 담기</span></button>
+  </div>
+  <div class="below-tray"><span><kbd>왼쪽 드래그</kbd> 그리기 <span class="bullet">·</span> <kbd>오른쪽 클릭</kbd> 지우기 <span class="bullet">·</span> <kbd>Space</kbd> 다시 시작</span><button id="quickHelpBtn">놀이 방법</button><button id="freeBtn">퍼즐 없이 자유롭게 그릴래요 <span>↗</span></button></div>
+</section>
+<footer class="footer"><span>MUMU'S CREATIVE PLAYGROUND</span><span>정답은 하나가 아니니까. 마음껏 그려봐요. <i>♡</i></span><button id="aboutBtn">놀이 방법</button></footer>
+</main>
+<dialog id="stagesDialog" class="stages-dialog"><button class="close-dialog" aria-label="닫기">×</button><div class="eyebrow">MUMU'S PAPER GARDEN <span id="mapProgress">0 / 100 페이지 완성</span></div><h2>백 장의 종이 정원</h2><p>어느 페이지든 펼쳐보세요. 진행은 자동 저장돼요. 그림은 ‘작품 담기’로 남겨주세요.</p><div class="map-layout"><nav id="chapterMap" class="chapter-map" aria-label="10개 챕터"></nav><section class="map-page-list"><input id="stageSearch" type="search" placeholder="페이지 번호 또는 제목 찾기" aria-label="스테이지 찾기"><h3 id="mapChapterTitle" class="map-chapter-title"></h3><div id="stageGrid"></div></section></div></dialog>
+<dialog id="missionDialog" class="paper-dialog"><button class="close-dialog" aria-label="닫기">×</button><span class="eyebrow">A LITTLE ART CHALLENGE</span><h2 id="missionTitle">세 가지 색의 시작</h2><p id="missionDescription"></p><div class="mission-colors"><i></i><i></i><i></i></div><ol><li><b>관찰해요</b><span>어디에 빛이 오고, 빨간 원은 어디에 있나요?</span></li><li><b>그려봐요</b><span>색연필 도구로 장면에 내 이야기를 더해보세요.</span></li><li><b>발견해요</b><span>색을 바꾸면 어떤 느낌이 드는지 비교해보세요.</span></li></ol><p class="mission-note">점수도, 틀린 그림도 없어요. 시도한 것이 오늘의 작품이에요.</p><button class="primary-button close-dialog-button">색연필 들기 →</button></dialog>
+<dialog id="galleryDialog" class="gallery-dialog"><button class="close-dialog" aria-label="닫기">×</button><span class="eyebrow">MY LITTLE COLLECTION</span><h2>무무의 스케치북</h2><p>한 페이지, 한 페이지. 상상한 순간을 모아두었어요.</p><div id="galleryGrid"></div><p class="gallery-note">작품은 이 브라우저에 저장돼요. 소중한 그림은 PNG로도 내려받아 주세요.</p></dialog>
+<dialog id="aboutDialog" class="paper-dialog"><button class="close-dialog" aria-label="닫기">×</button><span class="eyebrow">HOW TO PLAY</span><h2>그림이 움직이기 시작해요.</h2><p>빨간 원을 별까지 보내면 페이지가 완성돼요.</p><ul class="how-to"><li><b>네모</b> 대각선으로 드래그하면 네모가 생겨요. 큰 물체는 더 무거워요.</li><li><b>물리펜</b> 네모나 길쭉한 막대를 그려보세요. 손그림은 회전하는 네모 물체가 돼요.</li><li><b>색연필</b> 충돌하지 않는 그림을 그려요. 무늬·명암·배경을 자유롭게 더해보세요.</li><li><b>지우개 / 오른쪽 클릭</b> 내가 그린 물체·색연필 선과 미리 그려진 보라색 벽을 지워요.</li><li><b>균형 잡기</b> 물체를 떨어뜨려 빨간 원을 굴리고, 판 위의 무게를 바꾸어보세요.</li></ul><p class="mission-note">종이 정원 그림·크레용 붓·효과음은 무무 크레용을 위해 새로 만들었어요. 글꼴은 Gaegu / Finger Paint, 물리 엔진은 Matter.js를 사용해요.</p><p class="mission-note">Crayon Physics의 그리기·무게·충돌 원리를 연구한 새 게임입니다. 퍼즐 배치와 그림은 무무만의 구성이며, 움직임은 원작과 차이가 있어요.</p></dialog>
+<script src="vendor/matter.min.js"></script><script src="src/campaign-levels.js"></script><script src="src/campaign-examples.js"></script><script src="src/mumu-art.js"></script><script src="src/core.js"></script><script src="src/campaign-ui.js"></script><script src="src/app.js"></script>
+</body></html>
