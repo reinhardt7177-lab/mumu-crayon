@@ -7,7 +7,8 @@ const A=MumuArt,bitmapReady=A.ready;
 const colors=[['코랄','#c67d66'],['햇살','#d8b458'],['풀잎','#85a17b'],['바다','#6d9ea1'],['남색','#677f9c'],['라일락','#a192af'],['살구','#dfb391'],['연필','#646c65']];
 const subtitles=['선 하나로 시작하는 작은 모험','작은 상상으로 건너는 틈','가벼움과 무거움 사이','나만의 길을 만드는 시간','조금 다른 시선으로 보는 숲','돌고 돌아 만나는 반짝임','모든 낙서가 하나의 이야기가 될 때'];
 const storage={get(key,fallback){try{return JSON.parse(localStorage.getItem('mumu-'+key))??fallback}catch{return fallback}},set(key,data){try{localStorage.setItem('mumu-'+key,JSON.stringify(data));return true}catch{return false}}};
-let current=0,world,tool='box',color=colors[0][1],penWidth=5,stroke=null,pointerId=null,art=[],history=[],particles=[],free=false,paused=false,audioOn=false,audio,clock=0,last=0,accumulator=0,winAt=0,seenWin=false,rescueNotice=0;
+let current=0,world,tool='box',color=colors[0][1],penWidth=5,stroke=null,art=[],history=[],particles=[],free=false,paused=false,audioOn=false,audio,clock=0,last=0,accumulator=0,winAt=0,seenWin=false,rescueNotice=0;
+let canvasInput;
 let demo=false,demoAction=0,demoDrawings=[],demoShownSecond=-1;
 let completed=storage.get('campaign-completed-v1',[]),gallery=storage.get('gallery',[]);
 if(!Array.isArray(completed))completed=[];completed=[...new Set(completed)].filter(n=>Number.isInteger(n)&&n>=0&&n<MUMU_LEVELS.length);
@@ -25,6 +26,7 @@ function status(){const n=world.stars.filter(s=>s.collected).length;$('starStatu
 function load(index,asFree=false,asDemo=false){
   index=Math.max(0,Math.min(MUMU_LEVELS.length-1,Number.isInteger(index)?index:0));
   if(world){M.Events.off(world.engine);M.Engine.clear(world.engine);}
+  canvasInput?.cancel();
   current=index;free=asFree;demo=asDemo&&!asFree;demoAction=0;demoDrawings=[];demoShownSecond=-1;art=[];history=[];particles=[];stroke=null;paused=false;seenWin=false;winAt=0;accumulator=0;last=0;
   const level=asFree?{...MUMU_LEVELS[0],bodies:MUMU_LEVELS[0].bodies.filter(b=>b.static||b.special==='da_ball'),stars:[],joints:[]}:MUMU_LEVELS[index];
   world=C.makeWorld(level,{
@@ -45,7 +47,6 @@ function refreshTabs(){MumuNavigator.refresh(current,free,completed);}
 function setTool(next){tool=next;for(const b of document.querySelectorAll('[data-tool]')){b.classList.toggle('selected',b.dataset.tool===tool);b.setAttribute('aria-pressed',String(b.dataset.tool===tool));}canvas.style.cursor=tool==='erase'?'cell':'crosshair';}
 document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
 $('penWidth').oninput=e=>{penWidth=Number(e.target.value);$('widthPreview').style.width=penWidth+'px';$('widthPreview').style.height=penWidth+'px';};
-function point(e){const r=canvas.getBoundingClientRect(),f=Math.min(r.width/W,r.height/H),left=r.left+(r.width-W*f)/2,top=r.top+(r.height-H*f)/2;return{x:(e.clientX-left)/f,y:(e.clientY-top)/f};}
 function lineDistance(p,a,b){const dx=b.x-a.x,dy=b.y-a.y,t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy||1)));return Math.hypot(p.x-a.x-dx*t,p.y-a.y-dy*t);}
 function erase(p){
   const body=C.eraseAt(world,p);
@@ -53,37 +54,23 @@ function erase(p){
   for(let i=art.length-1;i>=0;i--){const a=art[i];if(a.points.some((v,j)=>j?lineDistance(p,a.points[j-1],v)<a.width+8:Math.hypot(p.x-v.x,p.y-v.y)<a.width+8)){art.splice(i,1);history=history.filter(h=>h.art!==a);status();return true;}}
   return false;
 }
-canvas.addEventListener('contextmenu',e=>e.preventDefault());
-canvas.addEventListener('pointerdown',e=>{
-  if(demo)return;
-  if(e.button===2){e.preventDefault();erase(point(e));return;}
-  if(e.button!==0||pointerId!==null||!$('winCard').hidden)return;
-  const p=point(e);if(p.x<0||p.x>W||p.y<0||p.y>H)return;
-  canvas.focus({preventScroll:true});canvas.setPointerCapture(e.pointerId);pointerId=e.pointerId;
-  if(tool==='erase'){erase(p);stroke={points:[p],tool};return;}
-  stroke={points:[p],tool,color,width:penWidth};$('drawingTip').hidden=true;
-});
-canvas.addEventListener('pointermove',e=>{
-  if(e.pointerId!==pointerId||!stroke)return;const p=point(e);
-  if(stroke.tool==='erase'){erase(p);return;}
-  const coalesced=e.getCoalescedEvents?.();for(const event of (coalesced?.length?coalesced:[e])){const q=point(event),last=stroke.points[stroke.points.length-1];if(Math.hypot(q.x-last.x,q.y-last.y)>.7)stroke.points.push(q);}
-});
-function finish(e){
-  if(e.pointerId!==pointerId||!stroke)return;const s=stroke;stroke=null;pointerId=null;if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
-  const p=point(e),last=s.points[s.points.length-1];if(Math.hypot(p.x-last.x,p.y-last.y)>.7)s.points.push(p);
-  if(s.tool==='erase')return;
+function commitStroke(s){
   if(s.tool==='art'){const drawing={points:s.points,color:s.color,width:s.width,seed:art.length*773+3};art.push(drawing);history.push({art:drawing});tone(500,.035,.005);}
   else{
     let body=null;
-    if(s.tool==='box'){const a=s.points[0],b=s.points[s.points.length-1],w=Math.abs(a.x-b.x),h=Math.abs(a.y-b.y);if(w>=5&&h>=5)body=C.addDrawing(world,{x:(a.x+b.x)/2,y:(a.y+b.y)/2,width:w,height:h,angle:0},{color:s.color,penWidth:s.width});else toast('네모는 대각선으로 조금 더 크게 그려주세요.');}
-    else{body=C.addFreehand(world,s.points,{color:s.color,penWidth:s.width});if(!body)toast('물리펜으로 네모를 한 바퀴 그려보세요.');}
+    if(s.tool==='box'){const a=s.points[0],b=s.points[s.points.length-1],w=Math.abs(a.x-b.x),h=Math.abs(a.y-b.y);if(w>=5&&h>=5)body=C.addDrawing(world,{x:(a.x+b.x)/2,y:(a.y+b.y)/2,width:w,height:h,angle:0},{color:s.color,penWidth:s.width});else toast('네모를 대각선으로 조금 더 크게 그려주세요.');}
+    else{body=C.addFreehand(world,s.points,{color:s.color,penWidth:s.width});if(!body)toast('물리펜으로 조금 더 길게 그려주세요.');}
     if(body){history.push({body});tone(310,.08,.012,'triangle');}
   }
   status();
 }
-canvas.addEventListener('pointerup',finish);
-canvas.addEventListener('pointercancel',()=>{stroke=null;pointerId=null;});
-window.addEventListener('blur',()=>{stroke=null;pointerId=null;});
+canvasInput=MumuCanvasInput.bind(canvas,{
+  width:W,height:H,enabled:()=>!demo&&$('winCard').hidden,
+  style:()=>({tool,color,width:penWidth}),erase,
+  preview:s=>{stroke=s;},begin:()=>{$('drawingTip').hidden=true;},commit:commitStroke
+});
+window.addEventListener('blur',()=>canvasInput.cancel());
+window.addEventListener('resize',()=>canvasInput.cancel());
 $('undoBtn').onclick=()=>{const h=history.pop();if(h?.body)C.removeDrawing(world,h.body);if(h?.art)art=art.filter(a=>a!==h.art);status();};
 $('resetBtn').onclick=()=>{load(current,free);toast('새 종이를 펼쳤어요. 다시 그려볼까요?');};
 $('demoBtn').onclick=()=>{const keep=!demo&&(history.length||art.length);if(keep)saveArt();load(current,false,!demo);if(keep)toast('그리던 장면은 스케치북에 담았어요.');};
@@ -119,7 +106,7 @@ window.addEventListener('keydown',e=>{
   else if(e.code==='Space'){e.preventDefault();$('resetBtn').click();}
   else if(e.key.toLowerCase()==='p')$('pauseBtn').click();
   else if(['1','2','3','4'].includes(e.key))setTool(['box','physics','art','erase'][Number(e.key)-1]);
-  else if(e.key==='Escape'){$('winCard').hidden=true;stroke=null;pointerId=null;}
+  else if(e.key==='Escape'){$('winCard').hidden=true;canvasInput.cancel();}
 });
 function roughLine(...args){A.line(...args);}
 function background(){A.background(ctx,world,free);}
@@ -159,7 +146,7 @@ function frame(time){
  if(world.completed&&!free&&!seenWin&&clock>winAt){seenWin=true;const final=current===MUMU_LEVELS.length-1,all=completed.length===MUMU_LEVELS.length,chapterEnd=(current+1)%10===0;$('winTitle').textContent=demo?'이렇게도 풀 수 있어요.':all?'백 장의 정원이 완성됐어요!':final?'백 번째 종이 정원, 완성!':chapterEnd?'이 정원의 마지막 햇살!':'반짝! 해냈어요.';$('winText').textContent=demo?'이제 나만의 방법으로 그려볼까요?\n시범 재생은 완료 수에 기록되지 않아요.':all?'100페이지에 나만의 이야기를 남겼어요. 작품을 간직해볼까요?':final?'완성한 페이지 '+completed.length+' / 100\n목차에서 다른 정원도 펼쳐보세요.':chapterEnd?'한 챕터를 여행했어요. 다음 정원으로 가볼까요?':'이 장면에 나만의 색을 더해볼까요?';$('nextBtn').textContent=final?'목차 펼치기 →':'다음 페이지 →';$('winCard').hidden=false;tone(523,.4,.03);tone(659,.4,.025,'sine',.12);tone(784,.6,.025,'sine',.24);}
  render();requestAnimationFrame(frame);
 }
-document.addEventListener('visibilitychange',()=>{last=0;accumulator=0;stroke=null;pointerId=null;});
+document.addEventListener('visibilitychange',()=>{last=0;accumulator=0;canvasInput.cancel();});
 window.MumuGame={snapshot:()=>({level:current,total:MUMU_LEVELS.length,free,tool,paused,drawings:world.drawings.length,artStrokes:art.length,stars:world.stars.map(s=>({...s})),completed:world.completed,ball:{x:world.ball.position.x,y:world.ball.position.y},contacts:world.contacts,gallery:gallery.length}),version:'1.0.0'};
 Promise.all([bitmapReady,document.fonts.ready]).then(()=>{load(storage.get('campaign-last-stage-v1',0));requestAnimationFrame(frame);});
 })();

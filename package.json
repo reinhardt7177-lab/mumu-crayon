@@ -6,7 +6,7 @@
   "engines": { "node": ">=24" },
   "scripts": {
     "build": "node tools/build-site.cjs",
-    "test": "node tools/verify_physics.cjs && node tools/verify_campaign.cjs",
+    "test": "node tools/verify_physics.cjs && node tools/verify_input.cjs && node tools/verify_campaign.cjs",
     "check:site": "node tools/verify-site.cjs"
   }
 }

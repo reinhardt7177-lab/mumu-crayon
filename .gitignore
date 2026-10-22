@@ -11,6 +11,8 @@
 /src/*
 !/src/app.js
 !/src/core.js
+!/src/canvas-input.js
+!/src/mobile.css
 !/src/mumu-art.js
 !/src/campaign-levels.js
 !/src/campaign-examples.js
@@ -32,11 +34,13 @@
 !/tools/build-site.cjs
 !/tools/verify-site.cjs
 !/tools/verify_physics.cjs
+!/tools/verify_input.cjs
 !/tools/verify_campaign.cjs
 !/docs/
 /docs/*
 !/docs/CAMPAIGN-100.md
 !/docs/DEPLOYMENT.md
+!/docs/MOBILE-VALIDATION.md
 !/qa/
 /qa/*
 !/qa/campaign-solutions.json

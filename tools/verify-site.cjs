@@ -36,12 +36,13 @@ for (const css of files.filter(f => f.endsWith('.css'))) {
 const sandbox = {console};
 sandbox.window = sandbox;
 vm.createContext(sandbox);
-for (const source of ['vendor/matter.min.js', 'src/campaign-levels.js', 'src/campaign-examples.js', 'src/core.js']) {
+for (const source of ['vendor/matter.min.js', 'src/campaign-levels.js', 'src/campaign-examples.js', 'src/core.js', 'src/canvas-input.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, source), 'utf8'), sandbox, {filename: source});
 }
 assert.equal(sandbox.window.MUMU_LEVELS.length, 100);
 assert.equal(sandbox.window.MUMU_CHAPTERS.length, 10);
 assert.equal(sandbox.window.MUMU_EXAMPLES.length, 100);
+assert.equal(typeof sandbox.window.MumuCanvasInput.bind, 'function');
 for (const example of sandbox.window.MUMU_EXAMPLES) assert.ok(example && example.actions.length, 'Every stage needs a playable example.');
 const art = fs.readFileSync(path.join(root, 'src/mumu-art.js'), 'utf8');
 assert.ok(art.includes("paper.src='assets/mumu/paper-garden-v1.png'"));
