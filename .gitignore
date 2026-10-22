@@ -34,6 +34,7 @@
 !/tools/site-files.cjs
 !/tools/build-site.cjs
 !/tools/verify-site.cjs
+!/tools/verify-deployment.cjs
 !/tools/verify_physics.cjs
 !/tools/verify_input.cjs
 !/tools/verify_campaign.cjs
